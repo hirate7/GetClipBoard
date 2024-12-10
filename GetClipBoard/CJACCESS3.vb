@@ -34,6 +34,10 @@ Public Class CJACCESS3
         Dim Rs As New ADODB.Recordset
         Dim SQL As String
 
+        Do
+            If LockOn() = 0 Then Exit Do
+        Loop
+
         adoMyNumClip.BeginTrans()
 
         On Error GoTo TrnFalse
@@ -123,15 +127,137 @@ Public Class CJACCESS3
 
         adoMyNumClip.CommitTrans()
 
+        On Error GoTo 0
+
+        Do
+            Select Case LockOFF()
+                Case 0
+                    Exit Do
+                Case 1
+
+                Case Else
+                    Stop
+            End Select
+        Loop
+
         Beep()
 
         Exit Sub
 
 trnfalse:
 
+        On Error GoTo 0
+
         adoMyNumClip.RollbackTrans()
 
     End Sub
 
+    ''' <summary>
+    ''' アクセス権取得
+    ''' </summary>
+    ''' <returns>0:成功 1:JSY96に独占されている</returns>
+    Public Shared Function LockOn() As Integer
 
+
+        Dim Rs As New ADODB.Recordset
+        Dim SQL As String
+
+        SQL = "select * from Lock"
+
+        adoMyNumClip.BeginTrans()
+
+        On Error GoTo TrnFalse
+
+        Rs.Open(SQL, adoMyNumClip, ADODB.CursorTypeEnum.adOpenStatic, ADODB.LockTypeEnum.adLockOptimistic)
+
+        If Rs.BOF And Rs.EOF Then
+            Stop
+        Else
+            Rs.MoveFirst()
+        End If
+
+        Select Case Rs.Fields("USER").Value
+            Case "JSY96"
+                If Rs.Fields("DT").Value + TimeSerial(0, 0, 1) >= Now Then
+                    '1分以上経過していない
+                    Rs.Close()
+                    Return 1
+                End If
+        End Select
+
+        Rs.Fields("USER").Value = "GetClipBoard"
+        Rs.Fields("DT").Value = Now
+
+        Rs.Update()
+
+        Rs.Close()
+
+        adoMyNumClip.CommitTrans()
+
+        On Error GoTo 0
+
+        Return 0
+
+TrnFalse:
+
+        On Error GoTo 0
+
+        adoMyNumClip.RollbackTrans()
+
+        Return 1
+
+    End Function
+
+    ''' <summary>
+    ''' アクセス権解除
+    ''' </summary>
+    ''' <returns>0:成功 1:トランザクションロールバック 2:エラー</returns>
+    Public Shared Function LockOFF() As Integer
+
+        Dim Rs As New ADODB.Recordset
+        Dim SQL As String
+
+        adoMyNumClip.BeginTrans()
+
+        SQL = "select * from Lock"
+
+        On Error GoTo TrnFalse
+
+        Rs.Open(SQL, adoMyNumClip, ADODB.CursorTypeEnum.adOpenStatic, ADODB.LockTypeEnum.adLockOptimistic)
+
+        If Rs.BOF And Rs.EOF Then
+            Stop
+        Else
+            Rs.MoveFirst()
+        End If
+
+        Select Case Rs.Fields("USER").Value
+            Case "GetClipBoard"
+
+            Case Else
+                Return 2
+        End Select
+
+        Rs.Fields("USER").Value = ""
+        Rs.Fields("DT").Value = Nothing
+
+        Rs.Update()
+
+        Rs.Close()
+
+        adoMyNumClip.CommitTrans()
+
+        On Error GoTo 0
+
+        Return 0
+
+TrnFalse:
+
+        On Error GoTo 0
+
+        adoMyNumClip.RollbackTrans()
+
+        Return 1
+
+    End Function
 End Class

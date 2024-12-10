@@ -96,31 +96,34 @@ Public Class Form1
                         .InsuredCardClassification = S2(1)
 
                     Case "有効開始日"
-                        .InsuredCardValidDate = S2(1)
+                        If Tag = "資格情報" Then
+                            .InsuredCardValidDate = S2(1)
+                        ElseIf Tag = "高齢受給者証" Then
+                            .ElderlyRecipientValidStartDate = S2(1)
+                        End If
 
                     Case "有効終了日"
-                        .InsuredCardExpirationDate = S2(1)
+                        If Tag = "資格情報" Then
+                            .InsuredCardExpirationDate = S2(1)
+                        ElseIf Tag = "高齢受給者証" Then
+                            .ElderlyRecipientValidEndDate = S2(1)
+                        End If
 
                     Case "資格取得年月日"
                         .QualificationDate = S2(1)
 
                     Case "負担割合"
-                        .InsuredPartialContributionRatio = S2(1)
+                        If Tag = "資格情報" Then
+                            .InsuredPartialContributionRatio = S2(1)
+                        ElseIf Tag = "高齢受給者証" Then
+                            .ElderlyRecipientContributionRatio = S2(1)
+                        End If
 
                     Case "本人・家族の別"
                         .PersonalFamilyClassification = S2(1)
 
                     Case "被保険者氏名"
                         .InsuredName = S2(1)
-
-                    Case "有効開始日"
-                        .ElderlyRecipientValidStartDate = S2(1)
-
-                    Case "有効終了日"
-                        .ElderlyRecipientValidEndDate = S2(1)
-
-                    Case "負担割合"
-                        .ElderlyRecipientContributionRatio = S2(1)
 
                 End Select
 
