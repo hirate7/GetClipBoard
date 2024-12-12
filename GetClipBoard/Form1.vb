@@ -1,5 +1,6 @@
 ﻿Imports GetClipBoard.CMyNumAPI2
 Imports GetClipBoard.CJACCESS3
+Imports GetClipBoard.CGetClipBoard
 
 Public Class Form1
 
@@ -15,6 +16,7 @@ Public Class Form1
 
         ' この呼び出しは、Windows フォーム デザイナで必要です。
         InitializeComponent()
+
     End Sub
 
     ' クリップボードにテキストがコピーされると呼び出される
@@ -27,6 +29,12 @@ Public Class Form1
         S = args.Text
 
         If Left_(S, 4) <> "資格情報" Then
+            Return
+        End If
+
+        If Left_(S, 8) = "資格情報" + vbTab + "END" Then
+            Me.Close()
+            Clipboard.Clear()
             Return
         End If
 
@@ -152,33 +160,26 @@ Public Class Form1
 
     End Sub
 
-    Public Shared Function Left_(ByVal S As String, ByVal I As Integer) As String
-        'Microsoft.VisualBasic.Left()と同じ
-        'Inports Microsoft.VisualBasicを書いてもMicrosoft.VisualBasicの
-        '名前空間を指定しなければならない場合に名前が長くならないようにするため
-
-        Return Microsoft.VisualBasic.Left(S, I)
-
-    End Function
-
-    Public Shared Function Right_(ByVal S As String, ByVal I As Integer) As String
-        'Microsoft.VisualBasic.Left()と同じ
-        'Inports Microsoft.VisualBasicを書いてもMicrosoft.VisualBasicの
-        '名前空間を指定しなければならない場合に名前が長くならないようにするため
-
-        Return Microsoft.VisualBasic.Right(S, I)
-
-    End Function
-
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
+
+        JPath = New CJPath
+        JPath.Read()
+
+        Personal = New CPersonal
+        Personal.Read()
+
+        Me.Text = Me.Text + " - " + Personal.J_Yago
+
+        ToolStripStatusLabel1.Text = JPath.CURRENT
+        ToolStripStatusLabel2.Text = JPath.KDATA
 
         Open_Connection()
 
-        If CheckRunningApp("JSY96.EXE") = False Then
-            'JSY96.EXEが起動していなければLockを初期化する
-            'Lockが不完全状態になったときにJSY96.EXEを終了してGetClipBoard.exeを走らせれば復旧するように
-            LockOFF(1)
-        End If
+        'If CheckRunningApp("JSY96.EXE") = False Then
+        '    'JSY96.EXEが起動していなければLockを初期化する
+        '    'Lockが不完全状態になったときにJSY96.EXEを終了してGetClipBoard.exeを走らせれば復旧するように
+        '    LockOFF(1)
+        'End If
 
     End Sub
 
@@ -186,6 +187,16 @@ Public Class Form1
 
         Close_Connection()
 
+    End Sub
+
+    Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+
+        Dim ps As System.Diagnostics.Process() =
+            System.Diagnostics.Process.GetProcessesByName("jsy96")
+        If 0 < ps.Length Then
+            '見つかった時は、アクティブにする
+            Microsoft.VisualBasic.Interaction.AppActivate(ps(0).Id)
+        End If
     End Sub
 
     ''' <summary>

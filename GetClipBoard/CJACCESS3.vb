@@ -1,9 +1,10 @@
 ﻿Imports GetClipBoard.CMyNumAPI2
+Imports GetClipBoard.CGetClipBoard
 
 Public Class CJACCESS3
 
     Public Shared adoMyNumClip As ADODB.Connection
-    Public Shared MyNum_Connect As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + CGetClipBoard.Path_KDATA + "MyNumClip.mdb;Jet OLEDB:Database Password=4300365;Persist Security Info=False"
+    'Public Shared MyNum_Connect As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + CGetClipBoard.Path_KDATA + "MyNumClip.mdb;Jet OLEDB:Database Password=4300365;Persist Security Info=False"
 
     Public Shared Sub Open_Connection()
 
@@ -14,7 +15,7 @@ Public Class CJACCESS3
         adoMyNumClip = New ADODB.Connection
 
         adoMyNumClip.Mode = ADODB.ConnectModeEnum.adModeReadWrite
-        adoMyNumClip.Open(MyNum_Connect, , , lngOptions)
+        adoMyNumClip.Open(JPath.MyNum_Connect, , , lngOptions)
 
         '/// 接続が完了するまで待機する ///
         Do While adoMyNumClip.State <> ADODB.ObjectStateEnum.adStateOpen
@@ -189,7 +190,7 @@ trnfalse:
 
         Select Case Rs.Fields("USER").Value
             Case "JSY96"
-                Return 1
+                GoTo TrnFalse
         End Select
 
         Rs.Fields("USER").Value = "GetClipBoard"
@@ -235,6 +236,8 @@ TrnFalse:
 
         If Rs.BOF And Rs.EOF Then
             '有り得ない
+            On Error GoTo 0
+            adoMyNumClip.RollbackTrans()
             Return 2
         Else
             Rs.MoveFirst()
@@ -245,6 +248,8 @@ TrnFalse:
                 Case "GetClipBoard"
 
                 Case Else
+                    On Error GoTo 0
+                    adoMyNumClip.RollbackTrans()
                     Return 2
             End Select
         End If
