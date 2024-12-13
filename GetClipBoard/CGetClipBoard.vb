@@ -1,8 +1,58 @@
 ﻿Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
 Imports System.IO
+Imports Microsoft.Win32
 
 Public Class CGetClipBoard
+
+    Public Shared Sub Main()
+
+        '二重起動をチェックする
+        If Diagnostics.Process.GetProcessesByName(
+        Diagnostics.Process.GetCurrentProcess.ProcessName).Length > 1 Then
+            'すでに起動していると判断して終了
+            Return
+        End If
+
+        'Dim ps As System.Diagnostics.Process() = System.Diagnostics.Process.GetProcessesByName("jsy96")
+        'If 0 < ps.Length Then
+
+        '    '見つかった時は、アクティブにする
+        '    'Application.DoEvents()
+        '    'Dim DT As DateTime
+        '    'DT = Now + New TimeSpan(0, 0, 1)
+        '    'Do
+        '    '    If Now > DT Then
+        '    '        Me.Visible = True
+        '    '        Exit Do
+        '    '    End If
+        '    'Loop
+
+        '    'Microsoft.VisualBasic.Interaction.AppActivate(ps(0).Id)
+        '    'Application.DoEvents()
+        '    'Me.BackColor = Color.AliceBlue
+
+        '    'Me.Hide()
+        '    'Application.DoEvents()
+
+        '    'Application.DoEvents()
+
+        '    'Dim DT As DateTime
+        '    'DT = Now + New TimeSpan(0, 0, 2)
+        '    'Do
+        '    '    If Now > DT Then
+        '    '        'Me.Visible = True
+        '    '        Exit Do
+        '    '    End If
+        '    'Loop
+
+        'End If
+
+        Dim frmGetClipBoard As New frmCGetClipBoard
+
+        frmGetClipBoard.ShowDialog()
+
+    End Sub
 
     Public Class ClipboardEventArgs
         Inherits EventArgs
@@ -129,6 +179,10 @@ Public Class CGetClipBoard
 
         Public CURRENT As String
 
+        '相対パス
+        Public KDATA0 As String
+
+        '絶対パス
         Dim m_Path_KDATA As String
 
         Public ReadOnly Property KDATA() As String
@@ -163,14 +217,14 @@ Public Class CGetClipBoard
             End If
 
             If Environment.CommandLine.Count = 1 Then
-                m_Path_KDATA = Environment.GetCommandLineArgs(1)
+                KDATA0 = Environment.GetCommandLineArgs(1)
             End If
-            If m_Path_KDATA = "" Then
-                m_Path_KDATA = CURRENT + "KDATA\"
+            If KDATA0 = "" Then
+                KDATA0 = "KDATA\"
+            ElseIf Right_(KDATA0, 1) <> "\" Then
+                KDATA0 = KDATA0 + "\"
             End If
-            If Right_(m_Path_KDATA, 1) <> "\" Then
-                m_Path_KDATA = m_Path_KDATA + "\"
-            End If
+            m_Path_KDATA = CURRENT + KDATA0
 
         End Sub
 

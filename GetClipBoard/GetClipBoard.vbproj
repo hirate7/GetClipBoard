@@ -6,11 +6,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{6C820FD3-BD09-45E0-9272-0F6765B4D7DB}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>GetClipBoard.My.MyApplication</StartupObject>
+    <StartupObject>Sub Main</StartupObject>
     <RootNamespace>GetClipBoard</RootNamespace>
     <AssemblyName>GetClipBoard</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <MyType>WindowsForms</MyType>
+    <MyType>WindowsFormsWithCustomSubMain</MyType>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -49,7 +49,7 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Filing.ico</ApplicationIcon>
+    <ApplicationIcon>MyNum2.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="adodb, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -85,11 +85,10 @@
     <Compile Include="CGetClipBoard.vb" />
     <Compile Include="CJACCESS3.vb" />
     <Compile Include="CMyNumAPI2.vb" />
-    <Compile Include="Form1.vb">
-      <SubType>Form</SubType>
+    <Compile Include="frmCGetClipBoard.Designer.vb">
+      <DependentUpon>frmCGetClipBoard.vb</DependentUpon>
     </Compile>
-    <Compile Include="Form1.Designer.vb">
-      <DependentUpon>Form1.vb</DependentUpon>
+    <Compile Include="frmCGetClipBoard.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -109,8 +108,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.vb</DependentUpon>
+    <EmbeddedResource Include="frmCGetClipBoard.resx">
+      <DependentUpon>frmCGetClipBoard.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -133,6 +132,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Filing.ico" />
+    <Content Include="MyNum.ico" />
+    <Content Include="MyNum2.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

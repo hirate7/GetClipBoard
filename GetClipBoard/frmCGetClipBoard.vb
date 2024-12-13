@@ -1,6 +1,7 @@
 ﻿Imports GetClipBoard.CMyNumAPI2
 Imports GetClipBoard.CJACCESS3
 Imports GetClipBoard.CGetClipBoard
+Imports Microsoft.Win32
 
 Public Class frmCGetClipBoard
 
@@ -164,6 +165,11 @@ Public Class frmCGetClipBoard
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
 
+        ''イベントをイベントハンドラに関連付ける
+        ''フォームコンストラクタなどの適当な位置に記述してもよい
+        'AddHandler SystemEvents.SessionEnding,
+        'AddressOf SystemEvents_SessionEnding
+
         JPath = New CJPath
         JPath.Read()
 
@@ -185,52 +191,36 @@ Public Class frmCGetClipBoard
 
     End Sub
 
+    ''ログオフ、シャットダウンしようとしているとき
+    'Private Sub SystemEvents_SessionEnding(
+    '        ByVal sender As Object,
+    '        ByVal e As SessionEndingEventArgs)
+    '    Dim s As String
+    '    If e.Reason = SessionEndReasons.Logoff Then
+    '        s = "ログオフしようとしています。"
+    '    ElseIf e.Reason = SessionEndReasons.SystemShutdown Then
+    '        s = "シャットダウンしようとしています。"
+    '    End If
+    '    If MessageBox.Show(s + vbNewLine + "キャンセルしますか？",
+    '            "質問", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+    '        'キャンセルする
+    '        e.Cancel = True
+    '    End If
+    '    Me.Close()
+
+    'End Sub
+
     Private Sub Form1_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
 
-        If m_DoubleRun = False Then
-            Close_Connection()
-        End If
-
-    End Sub
-
-    Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-
-        'Me.WindowState = FormWindowState.Minimized
-        ''Application.DoEvents()
-
-
-        'Dim ps As System.Diagnostics.Process() =
-        '    System.Diagnostics.Process.GetProcessesByName("jsy96")
-        'If 0 < ps.Length Then
-
-        '    '見つかった時は、アクティブにする
-        '    'Application.DoEvents()
-        '    'Dim DT As DateTime
-        '    'DT = Now + New TimeSpan(0, 0, 1)
-        '    'Do
-        '    '    If Now > DT Then
-        '    '        Me.Visible = True
-        '    '        Exit Do
-        '    '    End If
-        '    'Loop
-
-        '    Microsoft.VisualBasic.Interaction.AppActivate(ps(0).Id)
-        '    'Application.DoEvents()
-        '    'Me.BackColor = Color.AliceBlue
-
-        '    'Me.Hide()
-        '    'Application.DoEvents()
-
-        '    'Dim DT As DateTime
-        '    'DT = Now + New TimeSpan(0, 0, 2)
-        '    'Do
-        '    '    If Now > DT Then
-        '    '        Me.Visible = True
-        '    '        Exit Do
-        '    '    End If
-        '    'Loop
-
+        'If m_DoubleRun = False Then
+        '    Close_Connection()
         'End If
+
+        ''イベントを解放する
+        ''フォームDisposeメソッド内の基本クラスのDisposeメソッド呼び出しの前に
+        ''記述してもよい
+        'RemoveHandler SystemEvents.SessionEnding,
+        '    AddressOf SystemEvents_SessionEnding
 
     End Sub
 
@@ -260,5 +250,30 @@ Public Class frmCGetClipBoard
         Return False
 
     End Function
+
+    Private Sub frmCGetClipBoard_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+
+        If m_DoubleRun = False Then
+            'FormClosedイベントで終了するとシャットダウン時にエラーが出るのでここに置く必要がある
+            Close_Connection()
+            'FileOpen(1, JPath.KDATA + "Success Close.txt", OpenMode.Output)
+            'FileClose(1)
+        End If
+
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs)
+        'MsgBox(Application.ProductName + " " + Application.ExecutablePath)
+
+        'Runキーを開く
+        Dim regkey As Microsoft.Win32.RegistryKey =
+            Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+            "Software\Microsoft\Windows\CurrentVersion\Run", True)
+        '値の名前に製品名、値のデータに実行ファイルのパスを指定し、書き込む
+        regkey.SetValue("GetClipBoard", JPath.CURRENT + "GetClipBoard.EXE " + JPath.KDATA0)
+        '閉じる
+        regkey.Close()
+
+    End Sub
 
 End Class
