@@ -181,6 +181,8 @@ Public Class frmCGetClipBoard
         ToolStripStatusLabel1.Text = JPath.CURRENT
         ToolStripStatusLabel2.Text = JPath.KDATA
 
+        mnuAutoStartup.Checked = RaedStartupState()
+
         Open_Connection()
 
         'If CheckRunningApp("JSY96.EXE") = False Then
@@ -262,12 +264,10 @@ Public Class frmCGetClipBoard
 
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs)
-        'MsgBox(Application.ProductName + " " + Application.ExecutablePath)
+    Private Sub RegistStartup()
 
         'Runキーを開く
-        Dim regkey As Microsoft.Win32.RegistryKey =
-            Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+        Dim regkey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
             "Software\Microsoft\Windows\CurrentVersion\Run", True)
         '値の名前に製品名、値のデータに実行ファイルのパスを指定し、書き込む
         regkey.SetValue("GetClipBoard", JPath.CURRENT + "GetClipBoard.EXE " + JPath.KDATA0)
@@ -276,4 +276,41 @@ Public Class frmCGetClipBoard
 
     End Sub
 
+    Private Function RaedStartupState() As Boolean
+
+        Dim S As String
+
+        S = Microsoft.Win32.Registry.GetValue("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run", "GetClipBoard", "")
+
+        If S <> "" Then
+            Return True
+        Else
+            Return False
+        End If
+
+    End Function
+
+    Private Sub DeleteStartup()
+
+        'スタートアップのレジストリから削除
+        'キーを書き込み許可で開く
+        Dim regkey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Run", True)
+
+        '指定したキーが見つからなくてもエラーは出ない
+        regkey.DeleteValue("GetClipBoard", True)
+
+        '閉じる
+        regkey.Close()
+
+    End Sub
+
+    Private Sub mnuAutoStartup_Click(sender As Object, e As EventArgs) Handles mnuAutoStartup.Click
+
+        If mnuAutoStartup.Checked Then
+            RegistStartup()
+        Else
+            DeleteStartup()
+        End If
+
+    End Sub
 End Class
