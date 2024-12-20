@@ -44,7 +44,11 @@ Public Class frmCGetClipBoard
         Res.RawData = S
 
         Dim S1() As String
-        S1 = Split(S, vbCrLf)
+        If InStr(S, vbCrLf) > 0 Then
+            S1 = Split(S, vbCrLf)
+        Else
+            S1 = Split(S, vbLf)
+        End If
 
         Dim S2() As String
 
