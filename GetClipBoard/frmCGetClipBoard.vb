@@ -29,7 +29,7 @@ Public Class frmCGetClipBoard
 
         S = args.Text
 
-        If Left_(S, 4) <> "資格情報" Then
+        If Left_(S, 4) <> "資格情報" And Left_(S, 4) <> "照会番号" Then
             Return
         End If
 
@@ -59,6 +59,10 @@ Public Class frmCGetClipBoard
             Dim I As Integer
             For I = 0 To UBound(S1)
                 S2 = Split(S1(I), vbTab)
+                If UBound(S2) = 0 Then
+                    ReDim Preserve S2(1)
+                    S2(1) = ""
+                End If
                 Select Case S2(0)
 
                     Case "資格情報", "裏面記載情報", "高齢受給者証"
@@ -137,6 +141,9 @@ Public Class frmCGetClipBoard
 
                     Case "被保険者氏名"
                         .InsuredName = S2(1)
+
+                    Case "照会番号"
+                        .ReferenceNumber = S2(1)
 
                 End Select
 

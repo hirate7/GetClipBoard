@@ -65,6 +65,9 @@
         '高齢受給者証一部負担金割合		
         Public ElderlyRecipientContributionRatio As String
 
+        '照会番号
+        Public ReferenceNumber As String
+
         Public RawData As String
 
     End Class
