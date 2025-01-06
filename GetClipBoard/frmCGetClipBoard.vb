@@ -23,152 +23,159 @@ Public Class frmCGetClipBoard
     ' クリップボードにテキストがコピーされると呼び出される
     Private Sub OnClipBoardChanged(ByVal sender As Object, ByVal args As CGetClipBoard.ClipboardEventArgs)
 
-        Dim Res As New CClipData
+        Try
 
-        Dim S As String
+            Dim Res As New CClipData
 
-        S = args.Text
+            Dim S As String
 
-        If Left_(S, 4) <> "資格情報" And Left_(S, 4) <> "照会番号" Then
-            Return
-        End If
+            S = args.Text
 
-        If Left_(S, 8) = "資格情報" + vbTab + "END" Then
-            Me.Close()
-            Clipboard.Clear()
-            Return
-        End If
-
-        txtRes.Text = S
-
-        Res.RawData = S
-
-        Dim S1() As String
-        If InStr(S, vbCrLf) > 0 Then
-            S1 = Split(S, vbCrLf)
-        Else
-            S1 = Split(S, vbLf)
-        End If
-
-        Dim S2() As String
-
-        Dim Tag As String = ""
-
-        With Res
-
-            Dim I As Integer
-            For I = 0 To UBound(S1)
-                S2 = Split(S1(I), vbTab)
-                If UBound(S2) = 0 Then
-                    ReDim Preserve S2(1)
-                    S2(1) = ""
-                End If
-                Select Case S2(0)
-
-                    Case "資格情報", "裏面記載情報", "高齢受給者証"
-                        Tag = S2(0)
-
-                    Case "確認日 : "
-                        .QualificationConfirmationDate = S2(1)
-
-                    Case "保険者番号"
-                        .InsurerNumber = S2(1)
-
-                    Case "保険者名"
-                        .InsurerName = S2(1)
-
-                    Case "記号"
-                        .InsuredCardSymbol = S2(1)
-
-                    Case "番号"
-                        .InsuredIdentificationNumber = S2(1)
-
-                    Case "枝番"
-                        .InsuredBranchNumber = S2(1)
-
-                    Case "フリガナ"
-                        .NameKana = S2(1)
-
-                    Case "氏名"
-                        If Tag = "資格情報" Then
-                            .Name = S2(1)
-                        ElseIf Tag = "裏面記載情報" Then
-                            .NameOfOther = S2(1)
-                        End If
-
-                    Case "氏名カナ"
-                        .NameOfOtherKana = S2(1)
-
-                    Case "生年月日"
-                        .Birthdate = S2(1)
-
-                    Case "性別"
-                        If Tag = "資格情報" Then
-                            .Sex1 = S2(1)
-                        ElseIf Tag = "裏面記載情報" Then
-                            .Sex2 = S2(1)
-                        End If
-
-                    Case "証区分"
-                        .InsuredCardClassification = S2(1)
-
-                    Case "有効開始日"
-                        If Tag = "資格情報" Then
-                            .InsuredCardValidDate = S2(1)
-                        ElseIf Tag = "高齢受給者証" Then
-                            .ElderlyRecipientValidStartDate = S2(1)
-                        End If
-
-                    Case "有効終了日"
-                        If Tag = "資格情報" Then
-                            .InsuredCardExpirationDate = S2(1)
-                        ElseIf Tag = "高齢受給者証" Then
-                            .ElderlyRecipientValidEndDate = S2(1)
-                        End If
-
-                    Case "資格取得年月日"
-                        .QualificationDate = S2(1)
-
-                    Case "負担割合"
-                        If Tag = "資格情報" Then
-                            .InsuredPartialContributionRatio = S2(1)
-                        ElseIf Tag = "高齢受給者証" Then
-                            .ElderlyRecipientContributionRatio = S2(1)
-                        End If
-
-                    Case "本人・家族の別"
-                        .PersonalFamilyClassification = S2(1)
-
-                    Case "被保険者氏名"
-                        .InsuredName = S2(1)
-
-                    Case "照会番号"
-                        .ReferenceNumber = S2(1)
-
-                End Select
-
-            Next I
-
-            '処理実行日時
-            .ProcessExecutionTime = Now
-
-            If .QualificationConfirmationDate = "" Then
-                Me.WindowState = FormWindowState.Normal
-                MsgBox("確認日不明の処理できないデータを受け取りました。", vbOKOnly Or vbCritical, Me.Text)
+            If Left_(S, 4) <> "資格情報" And Left_(S, 4) <> "照会番号" Then
                 Return
             End If
 
-        End With
+            If Left_(S, 8) = "資格情報" + vbTab + "END" Then
+                Me.Close()
+                Clipboard.Clear()
+                Return
+            End If
 
-        Select Case Add_ClipData(Res)
-            Case 0
-            Case 1
-                Me.WindowState = FormWindowState.Normal
-                MsgBox("「カルテ入力」とのデータベースの共有で問題が発生しています。", vbOKOnly Or vbCritical, Me.Text)
-            Case 2
-                Me.WindowState = FormWindowState.Normal
-                MsgBox("エラーのためマイナ資格確認アプリからのコピーが受け取れません。", vbOKOnly Or vbCritical, Me.Text)
-        End Select
+            txtRes.Text = S
+
+            Res.RawData = S
+
+            Dim S1() As String
+            If InStr(S, vbCrLf) > 0 Then
+                S1 = Split(S, vbCrLf)
+            Else
+                S1 = Split(S, vbLf)
+            End If
+
+            Dim S2() As String
+
+            Dim Tag As String = ""
+
+            With Res
+
+                Dim I As Integer
+                For I = 0 To UBound(S1)
+                    S2 = Split(S1(I), vbTab)
+                    If UBound(S2) = 0 Then
+                        ReDim Preserve S2(1)
+                        S2(1) = ""
+                    End If
+                    Select Case S2(0)
+
+                        Case "資格情報", "裏面記載情報", "高齢受給者証"
+                            Tag = S2(0)
+
+                        Case "確認日 : "
+                            .QualificationConfirmationDate = S2(1)
+
+                        Case "保険者番号"
+                            .InsurerNumber = S2(1)
+
+                        Case "保険者名"
+                            .InsurerName = S2(1)
+
+                        Case "記号"
+                            .InsuredCardSymbol = S2(1)
+
+                        Case "番号"
+                            .InsuredIdentificationNumber = S2(1)
+
+                        Case "枝番"
+                            .InsuredBranchNumber = S2(1)
+
+                        Case "フリガナ"
+                            .NameKana = S2(1)
+
+                        Case "氏名"
+                            If Tag = "資格情報" Then
+                                .Name = S2(1)
+                            ElseIf Tag = "裏面記載情報" Then
+                                .NameOfOther = S2(1)
+                            End If
+
+                        Case "氏名カナ"
+                            .NameOfOtherKana = S2(1)
+
+                        Case "生年月日"
+                            .Birthdate = S2(1)
+
+                        Case "性別"
+                            If Tag = "資格情報" Then
+                                .Sex1 = S2(1)
+                            ElseIf Tag = "裏面記載情報" Then
+                                .Sex2 = S2(1)
+                            End If
+
+                        Case "証区分"
+                            .InsuredCardClassification = S2(1)
+
+                        Case "有効開始日"
+                            If Tag = "資格情報" Then
+                                .InsuredCardValidDate = S2(1)
+                            ElseIf Tag = "高齢受給者証" Then
+                                .ElderlyRecipientValidStartDate = S2(1)
+                            End If
+
+                        Case "有効終了日"
+                            If Tag = "資格情報" Then
+                                .InsuredCardExpirationDate = S2(1)
+                            ElseIf Tag = "高齢受給者証" Then
+                                .ElderlyRecipientValidEndDate = S2(1)
+                            End If
+
+                        Case "資格取得年月日"
+                            .QualificationDate = S2(1)
+
+                        Case "負担割合"
+                            If Tag = "資格情報" Then
+                                .InsuredPartialContributionRatio = S2(1)
+                            ElseIf Tag = "高齢受給者証" Then
+                                .ElderlyRecipientContributionRatio = S2(1)
+                            End If
+
+                        Case "本人・家族の別"
+                            .PersonalFamilyClassification = S2(1)
+
+                        Case "被保険者氏名"
+                            .InsuredName = S2(1)
+
+                        Case "照会番号"
+                            .ReferenceNumber = S2(1)
+
+                    End Select
+
+                Next I
+
+                '処理実行日時
+                .ProcessExecutionTime = Now
+
+                If .QualificationConfirmationDate = "" Then
+                    Me.WindowState = FormWindowState.Normal
+                    MsgBox("確認日不明の処理できないデータを受け取りました。", vbOKOnly Or vbCritical, Me.Text)
+                    Return
+                End If
+
+            End With
+
+            Select Case Add_ClipData(Res)
+                Case 0
+                Case 1
+                    Me.WindowState = FormWindowState.Normal
+                    MsgBox("「カルテ入力」とのデータベースの共有で問題が発生しています。", vbOKOnly Or vbCritical, Me.Text)
+                Case 2
+                    Me.WindowState = FormWindowState.Normal
+                    MsgBox("エラーのためマイナ資格確認アプリからのコピーが受け取れません。", vbOKOnly Or vbCritical, Me.Text)
+            End Select
+
+        Catch ex As Exception
+            'エラーメッセージを表示する
+            MsgBox(ex.ToString, MsgBoxStyle.OkOnly Or MsgBoxStyle.Critical)
+        End Try
 
     End Sub
 

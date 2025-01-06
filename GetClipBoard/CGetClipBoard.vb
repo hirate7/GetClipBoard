@@ -5,7 +5,25 @@ Imports Microsoft.Win32
 
 Public Class CGetClipBoard
 
+    ''☆開発環境ではTrueにしてエラーをその場で止める☆
+    Public Shared DvevelopMode As Boolean = False
+
     Public Shared Sub Main()
+
+        If DvevelopMode Then
+            Main2()
+        Else
+            Try
+                Main2()
+            Catch ex As Exception
+                'エラーメッセージを表示する
+                MsgBox(ex.ToString, MsgBoxStyle.OkOnly Or MsgBoxStyle.Critical)
+            End Try
+        End If
+
+    End Sub
+
+    Public Shared Sub Main2()
 
         '二重起動をチェックする
         If Diagnostics.Process.GetProcessesByName(
