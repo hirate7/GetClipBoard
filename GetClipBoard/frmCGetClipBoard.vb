@@ -157,19 +157,20 @@ Public Class frmCGetClipBoard
                 If .QualificationConfirmationDate = "" Then
                     Me.WindowState = FormWindowState.Normal
                     MsgBox("確認日不明の処理できないデータを受け取りました。", vbOKOnly Or vbCritical, Me.Text)
+                    Me.WindowState = FormWindowState.Minimized
                     Return
                 End If
 
             End With
 
-            Select Case Add_ClipData(Res)
+            Dim ResNo As Integer = Add_ClipData(Res)
+            Select Case ResNo
                 Case 0
-                Case 1
+
+                Case Else
                     Me.WindowState = FormWindowState.Normal
-                    MsgBox("「カルテ入力」とのデータベースの共有で問題が発生しています。", vbOKOnly Or vbCritical, Me.Text)
-                Case 2
-                    Me.WindowState = FormWindowState.Normal
-                    MsgBox("エラーのためマイナ資格確認アプリからのコピーが受け取れません。", vbOKOnly Or vbCritical, Me.Text)
+                    MsgBox("コピー内容のデータベースへの書き込みでエラーが発生しました。" + vbCrLf + "エラー番号:" + CStr(ResNo), vbOKOnly Or vbCritical, Me.Text)
+                    Me.WindowState = FormWindowState.Minimized
             End Select
 
         Catch ex As Exception
@@ -331,4 +332,5 @@ Public Class frmCGetClipBoard
         End If
 
     End Sub
+
 End Class

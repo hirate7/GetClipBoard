@@ -49,6 +49,8 @@ Public Class CJACCESS3
             End If
         Loop
 
+        Dim TF As Integer = 2
+
         adoMyNumClip.BeginTrans()
 
         On Error GoTo trnfalse
@@ -59,15 +61,20 @@ Public Class CJACCESS3
             " and InsuredIdentificationNumber='" + CP.InsuredIdentificationNumber + "'" +
             " and InsuredBranchNumber='" + CP.InsuredBranchNumber + "'"
 
+        TF = 3
         Rs.Open(SQL, adoMyNumClip, ADODB.CursorTypeEnum.adOpenStatic, ADODB.LockTypeEnum.adLockOptimistic)
 
         If Rs.BOF And Rs.EOF Then
+            TF = 4
             Rs.AddNew()
         Else
+            TF = 5
             Rs.MoveFirst()
         End If
 
         With CP
+
+            TF = 6
 
             '処理実行日時				
             Rs.Fields("ProcessExecutionTime").Value = .ProcessExecutionTime
@@ -136,10 +143,13 @@ Public Class CJACCESS3
 
         End With
 
+        TF = 7
         Rs.Update()
 
+        TF = 8
         Rs.Close()
 
+        TF = 9
         adoMyNumClip.CommitTrans()
 
         On Error GoTo 0
@@ -151,10 +161,10 @@ Public Class CJACCESS3
                     Exit Do
                 Case 1
                     If DT < Now Then
-                        Return 1
+                        Return 10
                     End If
                 Case Else
-                    Return 2
+                    Return 11
             End Select
         Loop
 
@@ -167,6 +177,28 @@ trnfalse:
         On Error GoTo 0
 
         adoMyNumClip.RollbackTrans()
+
+        Dim EF As Integer
+        DT = Now + New TimeSpan(0, 0, 10)
+        Do
+            Select Case LockOFF(0)
+                Case 0
+                    EF = 0
+                    Exit Do
+                Case 1
+                    If DT < Now Then
+                        EF = 1
+                        Exit Do
+                    End If
+                Case Else
+                    EF = 2
+                    Exit Do
+            End Select
+        Loop
+
+        Add_Error_Log("<" + CStr(EF * 100 + TF) + ":" + Now.ToString + ">" + vbCrLf + CP.RawData + vbCrLf)
+
+        Return EF * 100 + TF
 
     End Function
 
@@ -281,5 +313,17 @@ TrnFalse:
         Return 1
 
     End Function
+
+    Public Shared Sub Add_Error_Log(S As String)
+
+        'Shift JISで書き込む
+        '書き込むファイルが既に存在している場合は、ファイルの末尾に追加する
+        Dim sw As New System.IO.StreamWriter(JPath.KDATA + "LogGCBErr.txt", True, System.Text.Encoding.GetEncoding("utf-8"))
+        '内容を書き込む
+        sw.Write(S)
+        '閉じる
+        sw.Close()
+
+    End Sub
 
 End Class
