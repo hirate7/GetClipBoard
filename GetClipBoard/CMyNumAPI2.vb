@@ -14,13 +14,13 @@
         '被保険者証区分			
         Public InsuredCardClassification As String
         '保険者番号
-        Public InsurerNumber As String
+        Public InsurerNumber As String = ""
         '被保険者証記号			
-        Public InsuredCardSymbol As String
+        Public InsuredCardSymbol As String = ""
         '被保険者証番号
-        Public InsuredIdentificationNumber As String
+        Public InsuredIdentificationNumber As String = ""
         '被保険者証枝番			
-        Public InsuredBranchNumber As String
+        Public InsuredBranchNumber As String = ""
         '本人・家族の別			
         Public PersonalFamilyClassification As String
         '被保険者氏名(世帯主氏名)			
