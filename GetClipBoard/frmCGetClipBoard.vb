@@ -163,7 +163,9 @@ Public Class frmCGetClipBoard
 
             End With
 
+            Open_Connection()
             Dim ResNo As Integer = Add_ClipData(Res)
+            Close_Connection()
             Select Case ResNo
                 Case 0
 
@@ -202,7 +204,7 @@ Public Class frmCGetClipBoard
 
         mnuAutoStartup.Checked = RaedStartupState()
 
-        Open_Connection()
+        'Open_Connection()
 
         'If CheckRunningApp("JSY96.EXE") = False Then
         '    'JSY96.EXEが起動していなければLockを初期化する
@@ -276,7 +278,7 @@ Public Class frmCGetClipBoard
 
         If m_DoubleRun = False Then
             'FormClosedイベントで終了するとシャットダウン時にエラーが出るのでここに置く必要がある
-            Close_Connection()
+            'Close_Connection()
             'FileOpen(1, JPath.KDATA + "Success Close.txt", OpenMode.Output)
             'FileClose(1)
         End If
