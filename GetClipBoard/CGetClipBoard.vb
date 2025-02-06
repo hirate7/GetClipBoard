@@ -226,6 +226,10 @@ Public Class CGetClipBoard
         Public Sub Read()
             '機能   :グロ－バル変数(PATH_?????)にファイル名、ディレクトリ－名をセットする
 
+            Dim StrPath As String = System.Windows.Forms.Application.StartupPath
+
+            ChDir(StrPath)
+
             '/// カレントドライブ設定 ///
             Dim Fi As New FileInfo("INI\MPROG.INI")
             If Fi.Exists Then
@@ -233,6 +237,8 @@ Public Class CGetClipBoard
             Else
                 CURRENT = CURRENT0
             End If
+
+            MsgBox(CURRENT)
 
             If Environment.CommandLine.Count = 1 Then
                 KDATA0 = Environment.GetCommandLineArgs(1)
