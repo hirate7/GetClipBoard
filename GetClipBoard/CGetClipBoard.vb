@@ -238,8 +238,6 @@ Public Class CGetClipBoard
                 CURRENT = CURRENT0
             End If
 
-            MsgBox(CURRENT)
-
             If Environment.CommandLine.Count = 1 Then
                 KDATA0 = Environment.GetCommandLineArgs(1)
             End If
