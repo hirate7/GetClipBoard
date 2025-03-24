@@ -168,7 +168,7 @@ Public Class frmCGetClipBoard
             Close_Connection()
             Select Case ResNo
                 Case 0
-
+                    Clipboard.Clear()
                 Case Else
                     Me.WindowState = FormWindowState.Normal
                     MsgBox("コピー内容のデータベースへの書き込みでエラーが発生しました。" + vbCrLf + "エラー番号:" + CStr(ResNo), vbOKOnly Or vbCritical, Me.Text)
