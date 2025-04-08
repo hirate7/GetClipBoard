@@ -67,7 +67,7 @@ Public Class frmCGetClipBoard
                     End If
                     Select Case S2(0)
 
-                        Case "資格情報", "裏面記載情報", "高齢受給者証"
+                        Case "資格情報", "裏面記載情報", "高齢受給者証", "資格情報(医療保険)", "裏面記載情報(医療保険)"
                             Tag = S2(0)
 
                         Case "確認日 : "
@@ -92,11 +92,12 @@ Public Class frmCGetClipBoard
                             .NameKana = S2(1)
 
                         Case "氏名"
-                            If Tag = "資格情報" Then
-                                .Name = S2(1)
-                            ElseIf Tag = "裏面記載情報" Then
-                                .NameOfOther = S2(1)
-                            End If
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    .Name = S2(1)
+                                Case "裏面記載情報", "裏面記載情報(医療保険)"
+                                    .NameOfOther = S2(1)
+                            End Select
 
                         Case "氏名カナ"
                             .NameOfOtherKana = S2(1)
@@ -105,38 +106,42 @@ Public Class frmCGetClipBoard
                             .Birthdate = S2(1)
 
                         Case "性別"
-                            If Tag = "資格情報" Then
-                                .Sex1 = S2(1)
-                            ElseIf Tag = "裏面記載情報" Then
-                                .Sex2 = S2(1)
-                            End If
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    .Sex1 = S2(1)
+                                Case "裏面記載情報", "裏面記載情報(医療保険)"
+                                    .Sex2 = S2(1)
+                            End Select
 
                         Case "証区分"
                             .InsuredCardClassification = S2(1)
 
                         Case "有効開始日"
-                            If Tag = "資格情報" Then
-                                .InsuredCardValidDate = S2(1)
-                            ElseIf Tag = "高齢受給者証" Then
-                                .ElderlyRecipientValidStartDate = S2(1)
-                            End If
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    .InsuredCardValidDate = S2(1)
+                                Case "高齢受給者証"
+                                    .ElderlyRecipientValidStartDate = S2(1)
+                            End Select
 
                         Case "有効終了日"
-                            If Tag = "資格情報" Then
-                                .InsuredCardExpirationDate = S2(1)
-                            ElseIf Tag = "高齢受給者証" Then
-                                .ElderlyRecipientValidEndDate = S2(1)
-                            End If
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    .InsuredCardExpirationDate = S2(1)
+                                Case "高齢受給者証"
+                                    .ElderlyRecipientValidEndDate = S2(1)
+                            End Select
 
                         Case "資格取得年月日"
                             .QualificationDate = S2(1)
 
                         Case "負担割合"
-                            If Tag = "資格情報" Then
-                                .InsuredPartialContributionRatio = S2(1)
-                            ElseIf Tag = "高齢受給者証" Then
-                                .ElderlyRecipientContributionRatio = S2(1)
-                            End If
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    .InsuredPartialContributionRatio = S2(1)
+                                Case "高齢受給者証"
+                                    .ElderlyRecipientContributionRatio = S2(1)
+                            End Select
 
                         Case "本人・家族の別"
                             .PersonalFamilyClassification = S2(1)
