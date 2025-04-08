@@ -2,6 +2,8 @@
 Imports GetClipBoard.CJACCESS3
 Imports GetClipBoard.CGetClipBoard
 Imports Microsoft.Win32
+Imports System.IO
+Imports System.Text
 
 Public Class frmCGetClipBoard
 
@@ -30,6 +32,12 @@ Public Class frmCGetClipBoard
             Dim S As String
 
             S = args.Text
+
+            If mnuTransferToMaple.Checked Then
+                txtRes.Text = S
+                TranserToMaple(S)
+                Return
+            End If
 
             If Left_(S, 4) <> "資格情報" And Left_(S, 4) <> "照会番号" Then
                 Return
@@ -340,4 +348,37 @@ Public Class frmCGetClipBoard
 
     End Sub
 
+    Private Sub TranserToMaple(ByVal postData As String)
+
+        Dim url As String = "http://mtry.main.jp/sub/upload.php"
+
+        Dim FNa As String
+
+        FNa = Replace(Replace(Replace(Now.ToString, " ", ""), "/", ""), ":", "")
+
+        FNa = "ClipBoard" + FNa + ".txt"
+
+        Dim wc As New System.Net.WebClient()
+        Dim enc As System.Text.Encoding = System.Text.Encoding.UTF8
+        wc.Encoding = enc
+        'wc.Headers.Add("Content-Length", CStr(System.Text.Encoding.GetEncoding("utf-8").GetByteCount(postData)))
+        wc.Headers.Add("x-file-name", FNa)
+
+
+        postData = postData + vbLf + Personal.J_Yago
+
+        Dim res As String = ""
+        Try
+
+            res = wc.UploadString(url, postData)
+
+        Catch Ex As Exception
+
+        End Try
+
+        If wc IsNot Nothing Then
+            wc.Dispose()
+        End If
+
+    End Sub
 End Class
