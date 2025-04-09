@@ -102,9 +102,20 @@ Public Class frmCGetClipBoard
                         Case "氏名"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .Name <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .Name = S2(1)
                                 Case "裏面記載情報", "裏面記載情報(医療保険)"
+                                    If .NameOfOther <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .NameOfOther = S2(1)
+                                Case Else
+                                    UnexpectedError(S)
+                                    Return
                             End Select
 
                         Case "氏名カナ"
@@ -116,9 +127,20 @@ Public Class frmCGetClipBoard
                         Case "性別"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .Sex1 <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .Sex1 = S2(1)
                                 Case "裏面記載情報", "裏面記載情報(医療保険)"
+                                    If .Sex2 <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .Sex2 = S2(1)
+                                Case Else
+                                    UnexpectedError(S)
+                                    Return
                             End Select
 
                         Case "証区分"
@@ -127,17 +149,39 @@ Public Class frmCGetClipBoard
                         Case "有効開始日"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .InsuredCardValidDate <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .InsuredCardValidDate = S2(1)
                                 Case "高齢受給者証"
+                                    If .ElderlyRecipientValidStartDate <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .ElderlyRecipientValidStartDate = S2(1)
+                                Case Else
+                                    UnexpectedError(S)
+                                    Return
                             End Select
 
                         Case "有効終了日"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .InsuredCardExpirationDate <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .InsuredCardExpirationDate = S2(1)
                                 Case "高齢受給者証"
+                                    If .ElderlyRecipientValidEndDate <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .ElderlyRecipientValidEndDate = S2(1)
+                                Case Else
+                                    UnexpectedError(S)
+                                    Return
                             End Select
 
                         Case "資格取得年月日"
@@ -146,9 +190,20 @@ Public Class frmCGetClipBoard
                         Case "負担割合"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .InsuredPartialContributionRatio <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .InsuredPartialContributionRatio = S2(1)
                                 Case "高齢受給者証"
+                                    If .ElderlyRecipientContributionRatio <> Nothing Then
+                                        UnexpectedError(S)
+                                        Return
+                                    End If
                                     .ElderlyRecipientContributionRatio = S2(1)
+                                Case Else
+                                    UnexpectedError(S)
+                                    Return
                             End Select
 
                         Case "本人・家族の別"
@@ -192,6 +247,20 @@ Public Class frmCGetClipBoard
             'エラーメッセージを表示する
             MsgBox(ex.ToString, MsgBoxStyle.OkOnly Or MsgBoxStyle.Critical)
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 想定外のエラー
+    ''' </summary>
+    ''' <param name="S"></param>
+    Private Sub UnexpectedError(S As String)
+
+        Me.WindowState = FormWindowState.Normal
+        If MsgBox("想定外のデータのため処理できません。" + vbCrLf + "データをメープルに送信しますか？", vbYesNo Or MsgBoxStyle.DefaultButton1 Or vbCritical, Me.Text) = vbYes Then
+            TranserToMaple(S)
+        End If
+        Me.WindowState = FormWindowState.Minimized
 
     End Sub
 
