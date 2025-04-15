@@ -35,7 +35,7 @@ Public Class frmCGetClipBoard
 
             If mnuTransferToMaple.Checked Then
                 txtRes.Text = S
-                TranserToMaple(S)
+                TranserToMaple(S + vbLf + "///" + vbLf + "転送")
                 Return
             End If
 
@@ -103,18 +103,18 @@ Public Class frmCGetClipBoard
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
                                     If .Name <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .Name = S2(1)
                                 Case "裏面記載情報", "裏面記載情報(医療保険)"
                                     If .NameOfOther <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .NameOfOther = S2(1)
                                 Case Else
-                                    UnexpectedError(S)
+                                    UnexpectedError(S, S2(0), Tag)
                                     Return
                             End Select
 
@@ -128,18 +128,18 @@ Public Class frmCGetClipBoard
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
                                     If .Sex1 <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .Sex1 = S2(1)
                                 Case "裏面記載情報", "裏面記載情報(医療保険)"
                                     If .Sex2 <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .Sex2 = S2(1)
                                 Case Else
-                                    UnexpectedError(S)
+                                    UnexpectedError(S, S2(0), Tag)
                                     Return
                             End Select
 
@@ -150,18 +150,18 @@ Public Class frmCGetClipBoard
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
                                     If .InsuredCardValidDate <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .InsuredCardValidDate = S2(1)
                                 Case "高齢受給者証"
                                     If .ElderlyRecipientValidStartDate <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .ElderlyRecipientValidStartDate = S2(1)
                                 Case Else
-                                    UnexpectedError(S)
+                                    UnexpectedError(S, S2(0), Tag)
                                     Return
                             End Select
 
@@ -169,18 +169,18 @@ Public Class frmCGetClipBoard
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
                                     If .InsuredCardExpirationDate <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .InsuredCardExpirationDate = S2(1)
                                 Case "高齢受給者証"
                                     If .ElderlyRecipientValidEndDate <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .ElderlyRecipientValidEndDate = S2(1)
                                 Case Else
-                                    UnexpectedError(S)
+                                    UnexpectedError(S, S2(0), Tag)
                                     Return
                             End Select
 
@@ -191,18 +191,18 @@ Public Class frmCGetClipBoard
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
                                     If .InsuredPartialContributionRatio <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .InsuredPartialContributionRatio = S2(1)
                                 Case "高齢受給者証"
                                     If .ElderlyRecipientContributionRatio <> Nothing Then
-                                        UnexpectedError(S)
+                                        UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .ElderlyRecipientContributionRatio = S2(1)
                                 Case Else
-                                    UnexpectedError(S)
+                                    UnexpectedError(S, S2(0), Tag)
                                     Return
                             End Select
 
@@ -254,11 +254,11 @@ Public Class frmCGetClipBoard
     ''' 想定外のエラー
     ''' </summary>
     ''' <param name="S"></param>
-    Private Sub UnexpectedError(S As String)
+    Private Sub UnexpectedError(S As String, S0 As String, Tag As String)
 
         Me.WindowState = FormWindowState.Normal
         If MsgBox("想定外のデータのため処理できません。" + vbCrLf + "データをメープルに送信しますか？", vbYesNo Or MsgBoxStyle.DefaultButton1 Or vbCritical, Me.Text) = vbYes Then
-            TranserToMaple(S)
+            TranserToMaple(S + vbLf + "///" + vbLf + S0 + vbLf + Tag + vbLf + "想定外")
         End If
         Me.WindowState = FormWindowState.Minimized
 
