@@ -102,13 +102,13 @@ Public Class frmCGetClipBoard
                         Case "氏名"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
-                                    If .Name <> Nothing Then
+                                    If .Name IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .Name = S2(1)
                                 Case "裏面記載情報", "裏面記載情報(医療保険)"
-                                    If .NameOfOther <> Nothing Then
+                                    If .NameOfOther IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
@@ -127,13 +127,13 @@ Public Class frmCGetClipBoard
                         Case "性別"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
-                                    If .Sex1 <> Nothing Then
+                                    If .Sex1 IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .Sex1 = S2(1)
                                 Case "裏面記載情報", "裏面記載情報(医療保険)"
-                                    If .Sex2 <> Nothing Then
+                                    If .Sex2 IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
@@ -149,13 +149,13 @@ Public Class frmCGetClipBoard
                         Case "有効開始日"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
-                                    If .InsuredCardValidDate <> Nothing Then
+                                    If .InsuredCardValidDate IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .InsuredCardValidDate = S2(1)
                                 Case "高齢受給者証"
-                                    If .ElderlyRecipientValidStartDate <> Nothing Then
+                                    If .ElderlyRecipientValidStartDate IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
@@ -168,13 +168,13 @@ Public Class frmCGetClipBoard
                         Case "有効終了日"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
-                                    If .InsuredCardExpirationDate <> Nothing Then
+                                    If .InsuredCardExpirationDate IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .InsuredCardExpirationDate = S2(1)
                                 Case "高齢受給者証"
-                                    If .ElderlyRecipientValidEndDate <> Nothing Then
+                                    If .ElderlyRecipientValidEndDate IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
@@ -190,13 +190,13 @@ Public Class frmCGetClipBoard
                         Case "負担割合"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
-                                    If .InsuredPartialContributionRatio <> Nothing Then
+                                    If .InsuredPartialContributionRatio IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
                                     .InsuredPartialContributionRatio = S2(1)
                                 Case "高齢受給者証"
-                                    If .ElderlyRecipientContributionRatio <> Nothing Then
+                                    If .ElderlyRecipientContributionRatio IsNot Nothing Then
                                         UnexpectedError(S, S2(0), Tag)
                                         Return
                                     End If
