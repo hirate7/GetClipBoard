@@ -39,7 +39,7 @@ Public Class frmCGetClipBoard
                 Return
             End If
 
-            If Left_(S, 4) <> "資格情報" And Left_(S, 4) <> "照会番号" Then
+            If Left_(S, 4) <> "資格情報" And Left_(S, 4) <> "照会番号" And Left_(S, 5) <> "未就学区分" Then
                 Return
             End If
 
@@ -214,6 +214,14 @@ Public Class frmCGetClipBoard
 
                         Case "照会番号"
                             .ReferenceNumber = S2(1)
+
+                        Case "未就学区分"
+                            If S2(1) = "義務教育就学前" Then
+                                .PreschoolClassification = "1"
+                            Else
+                                UnexpectedError(S, S2(0), Tag)
+                                Return
+                            End If
 
                     End Select
 
