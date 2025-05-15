@@ -2,6 +2,8 @@
 Imports GetClipBoard.CJACCESS3
 Imports GetClipBoard.CGetClipBoard
 Imports Microsoft.Win32
+Imports System.IO
+Imports System.Text
 
 Public Class frmCGetClipBoard
 
@@ -31,7 +33,13 @@ Public Class frmCGetClipBoard
 
             S = args.Text
 
-            If Left_(S, 4) <> "資格情報" And Left_(S, 4) <> "照会番号" Then
+            If mnuTransferToMaple.Checked Then
+                txtRes.Text = S
+                TranserToMaple(S + vbLf + "///" + vbLf + "転送")
+                Return
+            End If
+
+            If Left_(S, 4) <> "資格情報" And Left_(S, 4) <> "照会番号" And Left_(S, 5) <> "未就学区分" Then
                 Return
             End If
 
@@ -94,9 +102,20 @@ Public Class frmCGetClipBoard
                         Case "氏名"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .Name IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .Name = S2(1)
                                 Case "裏面記載情報", "裏面記載情報(医療保険)"
+                                    If .NameOfOther IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .NameOfOther = S2(1)
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
                             End Select
 
                         Case "氏名カナ"
@@ -108,9 +127,20 @@ Public Class frmCGetClipBoard
                         Case "性別"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .Sex1 IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .Sex1 = S2(1)
                                 Case "裏面記載情報", "裏面記載情報(医療保険)"
+                                    If .Sex2 IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .Sex2 = S2(1)
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
                             End Select
 
                         Case "証区分"
@@ -119,17 +149,39 @@ Public Class frmCGetClipBoard
                         Case "有効開始日"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .InsuredCardValidDate IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .InsuredCardValidDate = S2(1)
                                 Case "高齢受給者証"
+                                    If .ElderlyRecipientValidStartDate IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .ElderlyRecipientValidStartDate = S2(1)
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
                             End Select
 
                         Case "有効終了日"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .InsuredCardExpirationDate IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .InsuredCardExpirationDate = S2(1)
                                 Case "高齢受給者証"
+                                    If .ElderlyRecipientValidEndDate IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .ElderlyRecipientValidEndDate = S2(1)
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
                             End Select
 
                         Case "資格取得年月日"
@@ -138,9 +190,20 @@ Public Class frmCGetClipBoard
                         Case "負担割合"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
+                                    If .InsuredPartialContributionRatio IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .InsuredPartialContributionRatio = S2(1)
                                 Case "高齢受給者証"
+                                    If .ElderlyRecipientContributionRatio IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
                                     .ElderlyRecipientContributionRatio = S2(1)
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
                             End Select
 
                         Case "本人・家族の別"
@@ -151,6 +214,14 @@ Public Class frmCGetClipBoard
 
                         Case "照会番号"
                             .ReferenceNumber = S2(1)
+
+                        Case "未就学区分"
+                            If S2(1) = "義務教育就学前" Then
+                                .PreschoolClassification = "1"
+                            Else
+                                UnexpectedError(S, S2(0), Tag)
+                                Return
+                            End If
 
                     End Select
 
@@ -184,6 +255,20 @@ Public Class frmCGetClipBoard
             'エラーメッセージを表示する
             MsgBox(ex.ToString, MsgBoxStyle.OkOnly Or MsgBoxStyle.Critical)
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 想定外のエラー
+    ''' </summary>
+    ''' <param name="S"></param>
+    Private Sub UnexpectedError(S As String, S0 As String, Tag As String)
+
+        Me.WindowState = FormWindowState.Normal
+        If MsgBox("想定外のデータのため処理できません。" + vbCrLf + "データをメープルに送信しますか？", vbYesNo Or MsgBoxStyle.DefaultButton1 Or vbCritical, Me.Text) = vbYes Then
+            TranserToMaple(S + vbLf + "///" + vbLf + S0 + vbLf + Tag + vbLf + "想定外")
+        End If
+        Me.WindowState = FormWindowState.Minimized
 
     End Sub
 
@@ -340,4 +425,37 @@ Public Class frmCGetClipBoard
 
     End Sub
 
+    Private Sub TranserToMaple(ByVal postData As String)
+
+        Dim url As String = "http://mtry.main.jp/sub/upload.php"
+
+        Dim FNa As String
+
+        FNa = Replace(Replace(Replace(Now.ToString, " ", ""), "/", ""), ":", "")
+
+        FNa = "ClipBoard" + FNa + ".txt"
+
+        Dim wc As New System.Net.WebClient()
+        Dim enc As System.Text.Encoding = System.Text.Encoding.UTF8
+        wc.Encoding = enc
+        'wc.Headers.Add("Content-Length", CStr(System.Text.Encoding.GetEncoding("utf-8").GetByteCount(postData)))
+        wc.Headers.Add("x-file-name", FNa)
+
+
+        postData = postData + vbLf + Personal.J_Yago
+
+        Dim res As String = ""
+        Try
+
+            res = wc.UploadString(url, postData)
+
+        Catch Ex As Exception
+
+        End Try
+
+        If wc IsNot Nothing Then
+            wc.Dispose()
+        End If
+
+    End Sub
 End Class
