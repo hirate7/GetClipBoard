@@ -75,7 +75,7 @@ Public Class frmCGetClipBoard
                     End If
                     Select Case S2(0)
 
-                        Case "資格情報", "裏面記載情報", "高齢受給者証", "資格情報(医療保険)", "裏面記載情報(医療保険)"
+                        Case "資格情報", "裏面記載情報", "高齢受給者証", "資格情報(医療保険)", "裏面記載情報(医療保険)", "資格情報(医療扶助)", "裏面記載情報(医療扶助)"
                             Tag = S2(0)
 
                         Case "確認日 : "
@@ -97,7 +97,19 @@ Public Class frmCGetClipBoard
                             .InsuredBranchNumber = S2(1)
 
                         Case "フリガナ"
-                            .NameKana = S2(1)
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    If .NameKana IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
+                                    .NameKana = S2(1)
+                                Case "資格情報(医療扶助)"
+
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
+                            End Select
 
                         Case "氏名"
                             Select Case Tag
@@ -113,16 +125,42 @@ Public Class frmCGetClipBoard
                                         Return
                                     End If
                                     .NameOfOther = S2(1)
+                                Case "資格情報(医療扶助)", "裏面記載情報(医療扶助)"
+
                                 Case Else
                                     UnexpectedError(S, S2(0), Tag)
                                     Return
                             End Select
 
                         Case "氏名カナ"
-                            .NameOfOtherKana = S2(1)
+                            Select Case Tag
+                                Case "裏面記載情報", "裏面記載情報(医療保険)"
+                                    If .NameOfOtherKana IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
+                                    .NameOfOtherKana = S2(1)
+                                Case "裏面記載情報(医療扶助)"
+
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
+                            End Select
 
                         Case "生年月日"
-                            .Birthdate = S2(1)
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    If .Birthdate IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
+                                    .Birthdate = S2(1)
+                                Case "資格情報(医療扶助)"
+
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
+                            End Select
 
                         Case "性別"
                             Select Case Tag
@@ -138,13 +176,27 @@ Public Class frmCGetClipBoard
                                         Return
                                     End If
                                     .Sex2 = S2(1)
+                                Case "資格情報(医療扶助)", "裏面記載情報(医療扶助)"
+
                                 Case Else
                                     UnexpectedError(S, S2(0), Tag)
                                     Return
                             End Select
 
                         Case "証区分"
-                            .InsuredCardClassification = S2(1)
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    If .InsuredCardClassification IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
+                                    .InsuredCardClassification = S2(1)
+                                Case "資格情報(医療扶助)"
+
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
+                            End Select
 
                         Case "有効開始日"
                             Select Case Tag
