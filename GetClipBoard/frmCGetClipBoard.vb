@@ -296,7 +296,9 @@ Public Class frmCGetClipBoard
             Close_Connection()
             Select Case ResNo
                 Case 0
-                    Clipboard.Clear()
+                    If mnuClearClipBoard.Checked Then
+                        Clipboard.Clear()
+                    End If
                 Case Else
                     Me.WindowState = FormWindowState.Normal
                     MsgBox("コピー内容のデータベースへの書き込みでエラーが発生しました。" + vbCrLf + "エラー番号:" + CStr(ResNo), vbOKOnly Or vbCritical, Me.Text)
@@ -345,6 +347,14 @@ Public Class frmCGetClipBoard
         ToolStripStatusLabel2.Text = JPath.KDATA
 
         mnuAutoStartup.Checked = RaedStartupState()
+
+        JEnv = New CJEnv(JPath.MPROG, "[設定]")
+
+        If Val(JEnv.Get("コピー後クリップボード削除", "1")) = 1 Then
+            mnuClearClipBoard.Checked = True
+        Else
+            mnuClearClipBoard.Checked = False
+        End If
 
         'Open_Connection()
 
@@ -507,6 +517,16 @@ Public Class frmCGetClipBoard
 
         If wc IsNot Nothing Then
             wc.Dispose()
+        End If
+
+    End Sub
+
+    Private Sub mnuClearClipBoard_Click(sender As Object, e As EventArgs) Handles mnuClearClipBoard.Click
+
+        If mnuClearClipBoard.Checked Then
+            JEnv.Put("コピー後クリップボード削除", "1")
+        Else
+            JEnv.Put("コピー後クリップボード削除", "0")
         End If
 
     End Sub

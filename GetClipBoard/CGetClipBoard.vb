@@ -215,6 +215,8 @@ Public Class CGetClipBoard
             End Get
         End Property
 
+        Public MPROG As String
+
         Public ReadOnly Property MyNum_Connect() As String
             Get
                 Return "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + Me.KDATA + "MyNumClip.mdb;Jet OLEDB:Database Password=4300365;Persist Security Info=False"
@@ -247,6 +249,8 @@ Public Class CGetClipBoard
                 KDATA0 = KDATA0 + "\"
             End If
             m_Path_KDATA = CURRENT + KDATA0
+
+            MPROG = CURRENT + "INI\MPROG.INI"
 
         End Sub
 
@@ -484,5 +488,448 @@ Public Class CGetClipBoard
         Return S0
 
     End Function
+
+    'Mprog.iniの設定を保持するオブジェクト
+    Public Shared JEnv As CJEnv
+
+    Class CJEnv
+        '柔整システムの設定MPROG.INI、Rprog.iniを保持するクラス
+
+        Private m_Path As String
+        Private m_Section As String
+
+        Class CMprog_Env
+            'Mprog.iniの設定を保持するための構造体
+
+            Public Entry As String 'エントリー
+            Public value As String '値
+            Public Chenge_F As Boolean '変更が有ったことを示すフラグ
+
+        End Class
+
+        'Mprog.iniの設定を保持する配列
+        Private Mprog_Env() As CMprog_Env
+
+        Public Sub New(ByVal Path As String, ByVal Section As String)
+
+            m_Path = Path
+            m_Section = Section
+
+        End Sub
+
+        ''' <summary>
+        ''' デフォルト値の設定
+        ''' </summary>
+        ''' <param name="Entry"></param>
+        ''' <param name="Def_Value"></param>
+        ''' <remarks></remarks>
+        Public Sub SetDefVal(ByVal Entry As String, ByVal Def_Value As String)
+
+            If Def_Value Is Nothing Then Throw New Exception("デフォルト値にNothingは指定できません。")
+
+            [Get](Entry, Def_Value)
+
+        End Sub
+
+        Public Function [Get](ByVal Entry As String, Optional ByVal Def_Value As String = Nothing) As String
+            '機能   :Mprog.iniの設定の呼び出し
+
+            '引渡   :Entry           :項目名
+
+            '       :Def_Value       :デフォルト値(Mprog.iniにない場合)
+            '戻り   :Entry           :保存
+
+            '       :Def_Value       :保存
+
+            '       :Get_Env　　     :設定値(INIファイルの仕様に拘わらず複数の値はもてないので注意)
+
+            Dim Stat As Integer
+            Dim Wk() As String
+            ReDim Wk(0)
+            Dim I As Integer
+
+            Static Readed As Boolean
+            If Readed = False Then
+
+                I = 0
+
+                Do
+
+                    Stat = 0
+                    Read_INI(m_Path, m_Section, Wk, Stat)
+
+                    If Stat Then Readed = True : Exit Do
+
+                    ReDim Preserve Mprog_Env(0 To I)
+                    Mprog_Env(I) = New CMprog_Env
+                    Mprog_Env(I).Entry = Wk(0)
+                    Mprog_Env(I).value = Wk(1)
+
+                    I = I + 1
+
+                Loop
+
+            End If
+
+            For I = 0 To UBound(Mprog_Env)
+                If Mprog_Env(I).Entry = Entry Then
+                    Exit For
+                End If
+            Next I
+
+            If UBound(Mprog_Env) < I Then
+                If Def_Value Is Nothing Then Throw New Exception("Get_Env()でデフォルト値が決まっていません。")
+                ReDim Preserve Mprog_Env(0 To I)
+                Mprog_Env(I) = New CMprog_Env
+                Mprog_Env(I).Entry = Entry
+                Mprog_Env(I).value = Def_Value
+            End If
+
+            [Get] = Mprog_Env(I).value
+
+        End Function
+
+        Public Function Get_B(ByVal Entry As String, Optional ByVal Def_Value As Boolean = False) As Boolean
+
+            Dim N As String
+            Dim F As String
+
+            If Def_Value = True Then
+                N = "1"
+            Else
+                N = "0"
+            End If
+
+            F = [Get](Entry, N)
+            Return Trim(F) = "1"
+
+        End Function
+
+        Public Sub Put(ByVal Entry As String, ByVal Value As String, Optional ByVal Save_F As Integer = 0)
+            '機能   :Mprog.iniの設定の書き込み
+            '       :Mprog_Env()を書き換えて、指定されたエントリーのみMprog.iniにその都度書き込む
+            '       :Mprog.INIになければ追加
+            '引渡   :Entry           :項目名
+
+            '       :Value           :値
+            '       :Save_F          :0:ファイルへ即書き込む 1:ファイルへの書き込みはしない
+
+            '戻り   :Entry           :保存
+
+            '       :Value           :保存
+
+            '       :Save_F          :保存
+
+
+            Dim Stat As Integer
+            Dim Wk() As String
+            ReDim Wk(0 To 2)
+            Dim I As Integer
+
+            For I = 0 To UBound(Mprog_Env)
+                If Mprog_Env(I).Entry = Entry Then
+                    Mprog_Env(I).value = Value
+                    Mprog_Env(I).Chenge_F = True
+                    Exit For
+                End If
+            Next I
+
+            If UBound(Mprog_Env) < I Then Throw New Exception()
+
+            If Save_F Then Exit Sub
+
+            Wk(0) = Entry
+            Wk(1) = Value
+
+            Stat = 1
+            EditIni(m_Path, m_Section, Wk, 1, Stat)
+
+        End Sub
+
+        Public Sub Put(ByVal Entry As String, ByVal Value As Boolean, Optional ByVal Save_F As Integer = 0)
+
+            Dim N As String
+
+            If Value = True Then
+                N = "1"
+            Else
+                N = "0"
+            End If
+
+            Put(Entry, N, Save_F)
+
+        End Sub
+
+        Public Sub Save()
+            '機能   :Mprog.iniの設定のファイルへの書き込み
+
+            Dim Stat As Integer
+            Dim Wk() As String
+            ReDim Wk(0 To 1)
+            Dim I As Integer
+            Dim U As Integer
+
+            U = -1
+            On Error Resume Next
+            U = UBound(Mprog_Env)
+            On Error GoTo 0
+
+            For I = 0 To U
+                If Mprog_Env(I).Chenge_F = True Then
+                    Wk(0) = Mprog_Env(I).Entry
+                    Wk(1) = Mprog_Env(I).value
+                    Stat = 1
+                    EditIni(m_Path, m_Section, Wk, 1, Stat)
+                End If
+            Next I
+
+        End Sub
+
+    End Class
+
+    Public Shared Sub EditIni(ByVal F As String, ByVal Sec As String, ByVal D() As String, ByVal DMax As Integer, ByRef ST As Integer)
+        'Sub EditIni(F As String, Sec As String, D() As String, DMax As Integer, ST As Integer)
+        '機能   iniファイルに項目を追加、または既存の項目を削除する
+        '引数   F       ファイル名
+        '       Sec     セクション名
+        '       D()     書き込む内容　D(0) = D(1),D(2),D(3)...
+        '       DMax    D()の添え字の最大値
+        '       st      処理モード  0..項目がなければ追加する。既に項目があるときは追加も上書きもしない。
+        '                           1..項目がなければ追加する。既に項目があれば上書きする。
+        '                           9..削除する。
+        '戻値   st      -1..エラー　他..正常終了
+        '
+        'EX)
+        'D(0)="A":D(1)="10",D(2)="20"
+        'EditIni "d.ini" ,"[設定]", D(), 2, 1
+        '
+        '[設定]
+        '"A = 10,20"
+
+        Dim I As Integer      '添え字
+        Dim J As Integer      '添え字
+        Dim K As Integer      '添え字
+        Dim FNo As Integer      'ファイル番号
+        Dim SS As String       'INIファイル処理用
+        Dim LMax As Integer      'INIファイル処理用
+        Dim L() As String       'INIファイル処理用
+        Dim WrtFlg As Boolean      'True..該当項目書込済　False..未書込
+        Dim SecFlg As Boolean      'True..該当セクションを処理中　False..該当セクションでない
+        Dim EdtStr As String       '書込文字列作成用
+        '
+        Dim FTbl() As String       '更新ファイルテーブル
+        Dim FTCnt As Integer      '更新ファイルテーブル件数
+
+        Dim F1 As String       '一時ファイル(.BAK)
+
+        FTCnt = 0
+        ReDim FTbl(FTCnt)
+
+        LMax = 0
+        ReDim L(LMax)
+        SecFlg = False
+        WrtFlg = False
+
+        '書き込みする文字列作成
+        If DMax > 0 Then
+            EdtStr = D(0) + " = "
+            If DMax > 1 Then
+                For I = 1 To (DMax - 1)
+                    EdtStr = EdtStr + D(I) + ","
+                Next I
+            End If
+            EdtStr = EdtStr + D(DMax)
+        Else
+            ST = -1
+            Exit Sub
+        End If
+
+        If Trim(Sec) = "" Then
+            'エラー終了　セクション名なし
+            ST = -1
+            Exit Sub
+        End If
+
+        'セクション名に[]を付ける
+        If InStr(Sec, "[") <= 0 Then
+            Sec = "[" + Trim(Sec)
+        End If
+        If InStr(Sec, "]") <= 0 Then
+            Sec = Trim(Sec) + "]"
+        End If
+
+        'INIファイル
+        FNo = FreeFile()
+        FileOpen(FNo, F, OpenMode.Input)
+
+        'INIファイル読込　ループ
+        While EOF(FNo) = False
+            SS = ""
+            SS = LineInput(FNo)
+            SepStr(SS, L, LMax)
+            If InStr(L(0), "[") > 0 And InStr(L(0), "]") > 0 And Left$(L(0), 1) <> ";" Then
+                'セクション検出
+                If TrimX(L(0)) = TrimX(Sec) Then
+                    '該当セクション検出
+                    SecFlg = True
+                Else
+                    If SecFlg = True Then
+                        '項目が検出されないまま、該当セクションが終了
+                        '項目を追加
+                        If ST <> 9 Then
+                            FTCnt = FTCnt + 1
+                            ReDim Preserve FTbl(FTCnt)
+                            FTbl(FTCnt) = EdtStr
+                        End If
+                        SecFlg = False
+                        WrtFlg = True
+                    End If
+                End If
+            End If
+            If SecFlg = True And TrimX(L(0)) = TrimX(D(0)) Then
+                '該当項目を検出
+                SecFlg = False
+                WrtFlg = True
+                Select Case ST
+                    Case 0  '追加・上書きしない
+                        'SS = SS　*読み込んだ内容のまま*
+                    Case 1  '追加・上書きする
+                        SS = EdtStr
+                    Case 9  '削除
+                        SS = "dElEtE"
+                End Select
+            End If
+            If SS <> "dElEtE" Then
+                'ST = 9 以外を書き込む
+                FTCnt = FTCnt + 1
+                ReDim Preserve FTbl(FTCnt)
+                FTbl(FTCnt) = SS
+            End If
+            '    WrtFlg = True
+        End While
+        FileClose(FNo)
+
+        '書込が行われないまま、INIファイル読込終了したときの処理
+        If WrtFlg = False Then
+            Select Case ST
+                Case 0  '追加・上書きしない
+                    If SecFlg = True Then
+                        '項目を追加
+                        FTCnt = FTCnt + 1
+                        ReDim Preserve FTbl(FTCnt)
+                        FTbl(FTCnt) = EdtStr
+                    Else
+                        'セクション、項目を追加
+                        FTCnt = FTCnt + 1
+                        ReDim Preserve FTbl(FTCnt)
+                        FTbl(FTCnt) = ""
+                        FTCnt = FTCnt + 1
+                        ReDim Preserve FTbl(FTCnt)
+                        FTbl(FTCnt) = Sec
+                        FTCnt = FTCnt + 1
+                        ReDim Preserve FTbl(FTCnt)
+                        FTbl(FTCnt) = EdtStr
+                    End If
+                Case 1  '追加・上書きする
+                    If SecFlg = True Then
+                        '項目を追加
+                        FTCnt = FTCnt + 1
+                        ReDim Preserve FTbl(FTCnt)
+                        FTbl(FTCnt) = EdtStr
+                    Else
+                        'セクション、項目を追加
+                        FTCnt = FTCnt + 1
+                        ReDim Preserve FTbl(FTCnt)
+                        FTbl(FTCnt) = ""
+                        FTCnt = FTCnt + 1
+                        ReDim Preserve FTbl(FTCnt)
+                        FTbl(FTCnt) = Sec
+                        FTCnt = FTCnt + 1
+                        ReDim Preserve FTbl(FTCnt)
+                        FTbl(FTCnt) = EdtStr
+                    End If
+                Case 9  '削除
+            End Select
+        End If
+
+        'INIファイルを更新する
+        'For I = 1 To 500 : DoEvents() : Next I
+
+        If FTCnt > 0 Then
+
+            I = InStr(F, ".")
+            F1 = Left$(F, I) + "BAK"
+            FNo = FreeFile()
+            FileOpen(FNo, F1, OpenMode.Output)
+            For I = 1 To FTCnt
+                PrintLine(FNo, FTbl(I))
+            Next I
+            FileClose(FNo)
+
+            Kill(F)
+            Dim FI As New System.IO.FileInfo(F)
+            My.Computer.FileSystem.RenameFile(F1, FI.Name)
+            'Name F1 As F
+
+        End If
+
+        'For I = 1 To 500 : DoEvents() : Next I
+
+    End Sub
+
+    Public Shared Sub SepStr(ByVal S As String, ByRef D() As String, ByRef DMax As Integer)
+        '機能   文字列を "," , "=" で分割し、D()に納める
+
+        '       先頭が";"の場合はコメントと見なし、
+
+        '       分割せずにD(0)に納める
+
+        '       文字列が空、もしくはスペースの場合も
+        '       D(0)に納める
+
+        '引数
+        '       S   分割したい文字列
+        '       D()
+        '       DMax
+        '戻値
+        '       S   保存
+
+        '       D() 分割された文字列
+        '       DMax 分割された数
+
+        Dim I As Integer
+        Dim SS As String
+        Dim S1 As String
+
+        ReDim D(0)
+        DMax = 0
+
+        '空白、またはコメント
+
+        If Trim(S) = "" Then
+            D(0) = S
+            Exit Sub
+        End If
+        If Left$(Trim(S), 1) = ";" Then
+            D(0) = S
+            Exit Sub
+        End If
+
+        '文字列を分割
+        SS = ""
+        For I = 1 To Len(S)
+            S1 = Mid$(S, I, 1)
+            If S1 = "," Or S1 = "=" Then
+                D(DMax) = SS
+                DMax = DMax + 1
+                ReDim Preserve D(DMax)
+                SS = ""
+            Else
+                SS = SS + S1
+            End If
+        Next I
+        D(DMax) = SS
+
+    End Sub
 
 End Class

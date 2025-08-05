@@ -31,6 +31,7 @@ Partial Class frmCGetClipBoard
         Me.mnuOption = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuAutoStartup = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuTransferToMaple = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuClearClipBoard = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -75,7 +76,7 @@ Partial Class frmCGetClipBoard
         '
         'mnuOption
         '
-        Me.mnuOption.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuAutoStartup, Me.mnuTransferToMaple})
+        Me.mnuOption.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuAutoStartup, Me.mnuTransferToMaple, Me.mnuClearClipBoard})
         Me.mnuOption.Name = "mnuOption"
         Me.mnuOption.Size = New System.Drawing.Size(62, 20)
         Me.mnuOption.Text = "オプション"
@@ -84,15 +85,22 @@ Partial Class frmCGetClipBoard
         '
         Me.mnuAutoStartup.CheckOnClick = True
         Me.mnuAutoStartup.Name = "mnuAutoStartup"
-        Me.mnuAutoStartup.Size = New System.Drawing.Size(181, 22)
+        Me.mnuAutoStartup.Size = New System.Drawing.Size(272, 22)
         Me.mnuAutoStartup.Text = "PC起動時に自動起動"
         '
         'mnuTransferToMaple
         '
         Me.mnuTransferToMaple.CheckOnClick = True
         Me.mnuTransferToMaple.Name = "mnuTransferToMaple"
-        Me.mnuTransferToMaple.Size = New System.Drawing.Size(181, 22)
+        Me.mnuTransferToMaple.Size = New System.Drawing.Size(272, 22)
         Me.mnuTransferToMaple.Text = "メープルへ転送"
+        '
+        'mnuClearClipBoard
+        '
+        Me.mnuClearClipBoard.CheckOnClick = True
+        Me.mnuClearClipBoard.Name = "mnuClearClipBoard"
+        Me.mnuClearClipBoard.Size = New System.Drawing.Size(272, 22)
+        Me.mnuClearClipBoard.Text = "コピー受け取り後にクリップボードを削除する"
         '
         'frmCGetClipBoard
         '
@@ -127,4 +135,5 @@ Partial Class frmCGetClipBoard
     Friend WithEvents mnuOption As ToolStripMenuItem
     Friend WithEvents mnuAutoStartup As ToolStripMenuItem
     Friend WithEvents mnuTransferToMaple As ToolStripMenuItem
+    Friend WithEvents mnuClearClipBoard As ToolStripMenuItem
 End Class
