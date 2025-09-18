@@ -275,6 +275,12 @@ Public Class frmCGetClipBoard
                                 Return
                             End If
 
+                        Case Else
+
+                            If InStr(S2(0), "住所") > 0 Then
+                                UnexpectedError(S, S2(0), Tag)
+                            End If
+
                     End Select
 
                 Next I
