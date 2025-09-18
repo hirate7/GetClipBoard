@@ -183,6 +183,36 @@ Public Class frmCGetClipBoard
                                     Return
                             End Select
 
+                        Case "郵便番号"
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    If .PostNumber IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
+                                    .PostNumber = S2(1)
+                                Case "資格情報(医療扶助)"
+
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
+                            End Select
+
+                        Case "住所"
+                            Select Case Tag
+                                Case "資格情報", "資格情報(医療保険)"
+                                    If .Address IsNot Nothing Then
+                                        UnexpectedError(S, S2(0), Tag)
+                                        Return
+                                    End If
+                                    .Address = S2(1)
+                                Case "資格情報(医療扶助)"
+
+                                Case Else
+                                    UnexpectedError(S, S2(0), Tag)
+                                    Return
+                            End Select
+
                         Case "証区分"
                             Select Case Tag
                                 Case "資格情報", "資格情報(医療保険)"
@@ -273,12 +303,6 @@ Public Class frmCGetClipBoard
                             Else
                                 UnexpectedError(S, S2(0), Tag)
                                 Return
-                            End If
-
-                        Case Else
-
-                            If InStr(S2(0), "住所") > 0 Then
-                                UnexpectedError(S, S2(0), Tag)
                             End If
 
                     End Select
