@@ -193,7 +193,7 @@ Public Class CGetClipBoard
     Public Class CJPath
 
         '☆開発環境でのファイルのパス☆
-        Private Const CURRENT0 = "c:\MAPLEO\"
+        Private Const CURRENT0 = "c:\MAPLEP\"
 
         Public CURRENT As String
 
