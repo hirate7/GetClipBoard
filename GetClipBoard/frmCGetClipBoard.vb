@@ -140,7 +140,7 @@ Public Class frmCGetClipBoard
                                         Return
                                     End If
                                     .NameOfOtherKana = S2(1)
-                                Case "裏面記載情報(医療扶助)","要配慮情報（備考）"
+                                Case "裏面記載情報(医療扶助)", "要配慮情報（備考）"
 
                                 Case Else
                                     UnexpectedError(S, S2(0), Tag)
